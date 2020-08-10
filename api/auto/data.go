@@ -4,8 +4,8 @@ import "github.com/leandroudala/golang_jwt/api/models"
 
 var users = []models.User{
 	{
-		Username:     "davidudala",
-		Email:        "david_udala@hotmail.com",
-		PasswordHash: "cmtc98280995",
+		Username:     "test",
+		Email:        "test@test.com",
+		PasswordHash: "2t9e0s5t94",
 	},
 }
