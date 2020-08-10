@@ -38,13 +38,21 @@ func (u *User) BeforeSave() error {
 	return nil
 }
 
-// AfterSave cleans password to avoid return after insert
-func (u *User) AfterSave() error {
+func (u *User) cleanBeforeShow() {
 	var boolNil bool
-
 	u.ID = 0
 	u.PasswordHash = ""
 	u.Admin = boolNil
+}
 
+// AfterSave cleans password to avoid return after insert
+func (u *User) AfterSave() error {
+	u.cleanBeforeShow()
 	return nil
+}
+
+// AfterFind cleans fields before show
+func (u *User) AfterFind() (err error) {
+	u.cleanBeforeShow()
+	return
 }

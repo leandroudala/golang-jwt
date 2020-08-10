@@ -19,11 +19,17 @@ func JSON(w http.ResponseWriter, statusCode int, data interface{}) {
 func ERROR(w http.ResponseWriter, statusCode int, err error) {
 	if err != nil {
 		w.WriteHeader(statusCode)
+		fmt.Println(struct {
+			Error string `json:"error"`
+		}{
+			Error: err.Error(),
+		})
 		JSON(w, statusCode, struct {
 			Error string `json:"error"`
 		}{
 			Error: err.Error(),
 		})
+	} else {
+		JSON(w, http.StatusBadRequest, nil)
 	}
-	JSON(w, http.StatusBadRequest, nil)
 }

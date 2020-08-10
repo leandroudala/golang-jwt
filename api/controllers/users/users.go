@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 
+	"github.com/gorilla/mux"
 	"github.com/leandroudala/golang_jwt/api/database"
 	"github.com/leandroudala/golang_jwt/api/models"
 	"github.com/leandroudala/golang_jwt/api/repository"
@@ -15,7 +17,24 @@ import (
 
 // All List all Users
 func All(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("List users"))
+	// connecting to the database
+	db, err := database.Connect()
+	if err != nil {
+		responses.ERROR(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	// inserting into the database
+	repo := crud.NewRepositoryUsersCRUD(db)
+
+	func(userRepository repository.UserRepository) {
+		users, err := userRepository.All()
+		if err != nil {
+			responses.ERROR(w, http.StatusInternalServerError, err)
+			return
+		}
+		responses.JSON(w, http.StatusOK, users)
+	}(repo)
 }
 
 // Create a new User
@@ -66,5 +85,31 @@ func Delete(w http.ResponseWriter, r *http.Request) {
 
 // Get a user
 func Get(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Get a user"))
+	vars := mux.Vars(r)
+
+	id, err := strconv.ParseUint(vars["id"], 10, 32)
+	if err != nil {
+		responses.ERROR(w, http.StatusBadRequest, err)
+	}
+
+	user := models.User{}
+	// connecting to the database
+	db, err := database.Connect()
+	if err != nil {
+		responses.ERROR(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	// inserting into the database
+	repo := crud.NewRepositoryUsersCRUD(db)
+
+	func(userRepository repository.UserRepository) {
+		var status int
+		user, status, err = userRepository.FindByID(uint32(id))
+		if err != nil {
+			responses.ERROR(w, status, err)
+			return
+		}
+		responses.JSON(w, http.StatusOK, user)
+	}(repo)
 }
