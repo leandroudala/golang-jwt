@@ -9,6 +9,9 @@ import (
 // JSON stringify response
 func JSON(w http.ResponseWriter, statusCode int, data interface{}) {
 	w.WriteHeader(statusCode)
+	if data == nil {
+		return
+	}
 	err := json.NewEncoder(w).Encode(data)
 	if err != nil {
 		fmt.Fprintf(w, "%s", err.Error())
@@ -18,12 +21,6 @@ func JSON(w http.ResponseWriter, statusCode int, data interface{}) {
 // ERROR returns an error
 func ERROR(w http.ResponseWriter, statusCode int, err error) {
 	if err != nil {
-		w.WriteHeader(statusCode)
-		fmt.Println(struct {
-			Error string `json:"error"`
-		}{
-			Error: err.Error(),
-		})
 		JSON(w, statusCode, struct {
 			Error string `json:"error"`
 		}{

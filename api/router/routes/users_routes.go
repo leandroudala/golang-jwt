@@ -18,17 +18,17 @@ var usersRoutes = []Route{
 		Handler: users.Create,
 	},
 	{
-		URI:     "/user/{id}",
+		URI:     "/user/{public_id}",
 		Method:  http.MethodPut,
 		Handler: users.Update,
 	},
 	{
-		URI:     "/user/{id}",
+		URI:     "/user/{public_id}",
 		Method:  http.MethodDelete,
 		Handler: users.Delete,
 	},
 	{
-		URI:     "/user/{id}",
+		URI:     "/user/{public_id}",
 		Method:  http.MethodGet,
 		Handler: users.Get,
 	},

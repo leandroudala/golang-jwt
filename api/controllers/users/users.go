@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"strconv"
 
 	"github.com/gorilla/mux"
 	"github.com/leandroudala/golang_jwt/api/database"
@@ -75,22 +74,74 @@ func Create(w http.ResponseWriter, r *http.Request) {
 
 // Update a user
 func Update(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Update user"))
+	vars := mux.Vars(r)
+	publicID := vars["public_id"]
+
+	user := models.User{}
+	// loading request body
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		responses.ERROR(w, http.StatusUnprocessableEntity, err)
+		return
+	}
+	// converting to json
+	err = json.Unmarshal(body, &user)
+	if err != nil {
+		responses.ERROR(w, http.StatusUnprocessableEntity, err)
+		return
+	}
+	// setting the public ID
+	user.PublicID = publicID
+
+	// connecting to the database
+	db, err := database.Connect()
+	if err != nil {
+		responses.ERROR(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	// inserting into the database
+	repo := crud.NewRepositoryUsersCRUD(db)
+
+	func(userRepository repository.UserRepository) {
+		var status int = 200
+		user, status, err = userRepository.Update(user)
+		if err != nil {
+			responses.ERROR(w, status, err)
+			return
+		}
+		responses.JSON(w, status, user)
+	}(repo)
 }
 
 // Delete a user
 func Delete(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Delete user"))
+	vars := mux.Vars(r)
+
+	// connecting to the database
+	db, err := database.Connect()
+	if err != nil {
+		responses.ERROR(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	// inserting into the database
+	repo := crud.NewRepositoryUsersCRUD(db)
+
+	func(userRepository repository.UserRepository) {
+		var status int
+		status, err = userRepository.Delete(vars["public_id"])
+		if err != nil {
+			responses.ERROR(w, status, err)
+			return
+		}
+		responses.JSON(w, http.StatusOK, nil)
+	}(repo)
 }
 
 // Get a user
 func Get(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-
-	id, err := strconv.ParseUint(vars["id"], 10, 32)
-	if err != nil {
-		responses.ERROR(w, http.StatusBadRequest, err)
-	}
 
 	user := models.User{}
 	// connecting to the database
@@ -105,7 +156,7 @@ func Get(w http.ResponseWriter, r *http.Request) {
 
 	func(userRepository repository.UserRepository) {
 		var status int
-		user, status, err = userRepository.FindByID(uint32(id))
+		user, status, err = userRepository.FindByID(vars["public_id"])
 		if err != nil {
 			responses.ERROR(w, status, err)
 			return

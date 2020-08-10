@@ -56,3 +56,18 @@ func (u *User) AfterFind() (err error) {
 	u.cleanBeforeShow()
 	return
 }
+
+// BeforeUpdate removes ID and public_id fields, and changes password hash, if informed
+func (u *User) BeforeUpdate() (err error) {
+	u.ID = 0
+	u.PublicID = ""
+
+	if u.PasswordHash == "" {
+		return
+	}
+
+	hashedPassword, err := security.Hash((u.PasswordHash))
+	u.PasswordHash = string(hashedPassword)
+
+	return
+}
