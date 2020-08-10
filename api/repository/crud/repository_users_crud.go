@@ -20,7 +20,8 @@ func NewRepositoryUsersCRUD(db *gorm.DB) *RepositoryUsersCRUD {
 }
 
 // Save a new user
-func (r *RepositoryUsersCRUD) Save(user models.User) (models.User, error) {
+func (r *RepositoryUsersCRUD) Save(user models.User) (models.User, int, error) {
+	var status int = 200
 	var err error
 	done := make(chan bool)
 	go func(ch chan<- bool) {
@@ -33,10 +34,17 @@ func (r *RepositoryUsersCRUD) Save(user models.User) (models.User, error) {
 	}(done)
 
 	if channels.OK(done) {
-		return user, nil
+		return user, status, nil
+	}
+	// handling errors
+	if strings.Contains(err.Error(), "Error 1062") {
+		status = 409
+		err = errors.New("Username already exists")
+	} else {
+		status = 500
 	}
 
-	return models.User{}, err
+	return models.User{}, status, err
 }
 
 // Update user

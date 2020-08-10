@@ -62,13 +62,14 @@ func Create(w http.ResponseWriter, r *http.Request) {
 	repo := crud.NewRepositoryUsersCRUD(db)
 
 	func(userRepository repository.UserRepository) {
-		user, err = userRepository.Save(user)
+		var status int = http.StatusCreated
+		user, status, err = userRepository.Save(user)
 		if err != nil {
-			responses.ERROR(w, http.StatusInternalServerError, err)
+			responses.ERROR(w, status, err)
 			return
 		}
 		w.Header().Set("Location", fmt.Sprintf("%s%s/%d", r.Host, r.RequestURI, user.ID))
-		responses.JSON(w, http.StatusCreated, user)
+		responses.JSON(w, status, user)
 	}(repo)
 }
 
