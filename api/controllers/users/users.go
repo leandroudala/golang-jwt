@@ -21,24 +21,26 @@ func All(w http.ResponseWriter, r *http.Request) {
 // Create a new User
 func Create(w http.ResponseWriter, r *http.Request) {
 	user := models.User{}
+	// loading request body
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		responses.ERROR(w, http.StatusUnprocessableEntity, err)
 		return
 	}
-
+	// converting to json
 	err = json.Unmarshal(body, &user)
 	if err != nil {
 		responses.ERROR(w, http.StatusUnprocessableEntity, err)
 		return
 	}
-
+	// connecting to the database
 	db, err := database.Connect()
 	if err != nil {
 		responses.ERROR(w, http.StatusInternalServerError, err)
 		return
 	}
 
+	// inserting into the database
 	repo := crud.NewRepositoryUsersCRUD(db)
 
 	func(userRepository repository.UserRepository) {

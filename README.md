@@ -1,7 +1,7 @@
 # Example of API made with Golang and JWT (JSON Web Token)
 Based on [this YouTube video](https://www.youtube.com/watch?v=YA6cVebkwJE).
 
-## Is it necessary to create a [.env file](#example-of-required-parameters-inside-env-file) in the root folder.
+## Is it necessary to create a [.env file](#example-of-required-parameters-inside-env-file) in the root folder
 Example of main struture files
 ```
 golang_jwt
@@ -30,6 +30,7 @@ golang_jwt
 ```
 
 ## Example of required parameters inside .env file
+Just create a file called `.env` in the root folder with these following parameters:
 ```
 API_PORT=3000
 DB_DRIVER=mysql

@@ -18,6 +18,11 @@ type User struct {
 	PasswordHash string    `gorm:"size:100;not null" json:"password,omitempty"`
 }
 
+// TableName returns the table name...
+func (u *User) TableName() string {
+	return "user"
+}
+
 // BeforeSave prepares user before save
 func (u *User) BeforeSave() error {
 	hashedPassword, err := security.Hash((u.PasswordHash))
@@ -42,9 +47,4 @@ func (u *User) AfterSave() error {
 	u.Admin = boolNil
 
 	return nil
-}
-
-// TableName returns the table name...
-func (u *User) TableName() string {
-	return "user"
 }
